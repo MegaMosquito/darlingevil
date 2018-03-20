@@ -1,4 +1,4 @@
-# Analog versus Digital
+# Analog versus Digital, Arduino and Pi
 
 The world is an analog place, but the Raspberry Pi is not very capable when it
 comes to performing analog input and output.  Although the Raspberry Pi has many
@@ -11,8 +11,9 @@ In contrast, most Arduino boards have many *analog* input GPIOs (often 8)
 and a similar number of GPIOs with hardware support for PWM.  So the Arduino
 boards are generally superior to the Raspberry Pi for interfacing with analog
 hardware components like simple sensors.  On the other hand, the Arduino boards
-are grossly underpowered (typically 8MHz-16MHz, 2KB RAM, 32KB flash) compared with
-the Raspberry Pi, and standard computer peripherals simply cannot be attached to most Arduinos.
+are grossly underpowered (typically 8MHz-16MHz, 2KB RAM, 32KB flash) for
+modern operating systems, like Linux.  Also, standard computer peripherals
+simply cannot be attached to most Arduinos.
 
 # Best of both worlds
 
@@ -24,15 +25,19 @@ Connect an Arduino to your Raspberry Pi.
 
 This directory contains example code to set up an Arduino microcontroller
 as a slave of a Raspberry Pi such that you can write code on the Raspberry Pi
-to control (i.e., read from and write to) the GPIO (General Purpose Input-Output)
-pins on the Arduino.  On the Arduino you simply run an open source “Firmata” driver (i.e., no Arduino coding is required with this approach).  On the Raspberry Pi you can program in any one of a dozen or more languages for which Firmata has provided client bindings.
+to control (i.e., read from and write to) the GPIO (General Purpose
+Input-Output) pins on the Arduino.  On the Arduino you simply run an open
+source “Firmata” driver (i.e., no Arduino coding is required with this
+approach).  On the Raspberry Pi you can program in any one of a dozen or
+more languages for which Firmata has provided client bindings (the code
+example provided is in Python).
 
-The [darlingevil.com website](https://darlingevil.com/electronics-arduino-raspberry-pi/) details all of the steps needed to get this up and running.
+The [darlingevil.com website](https://darlingevil.com/arduinopi/) details all of the steps needed to get this example up and running.
 
 # Files
 
 The files in this directory include:
-* AnalogIO.fzz    Fritzing source, sed to make the the circuit diagram
+* AnalogIO.fzz    Fritzing source, used to illustrate the circuit diagram
 * AnalogIO.ino    Hardware test program you can optionally run on the Arduino
 * AnalogIO.py     Example program to do the hardware test from the Raspberry Pi
 
