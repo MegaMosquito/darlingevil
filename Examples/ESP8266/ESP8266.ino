@@ -90,8 +90,8 @@ void show_i2c () {
 void setup() {
 
 #if DEBUG
-  Serial.begin(74880); // For bare module
-  // Serial.begin(115200); // For NodeMCU
+  // Serial.begin(74880); // For bare module
+  Serial.begin(115200); // For NodeMCU
   while(!Serial) {}
 #endif
 
