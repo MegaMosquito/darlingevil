@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-US">
+ <head>
+  <meta charset="UTF-8">
+  <title>DarlingEvil ESP8266 MQTT Subscriber</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+  <script>
+
+   // This is my organization ID in Watson IoT Platform
+   var org = "nzjnxq";
+   // Using a random MQTT "ID" for connecting to the MQTT broker (org prefix is required)
+   var mqtt_id = "a:" + org + ":" + parseInt(Math.random() * 100, 10);
+   // Use port 1883 for insecure access, or port 8883 for secure access
+   var port = 8883;
+   var client = new Paho.MQTT.Client(org + ".messaging.internetofthings.ibmcloud.com", port, mqtt_id);
+
+   var options = {
+    // This username and password are a read-only API key and token I created
+    // inside the Watson IoT Platform (left menu "Apps", then "create API Key")
+    userName:"a-nzjnxq-54fgzfxkkz",
+    password:"JHDLwj(2L!RZw37zs9",
+    useSSL:(port != 1883),
+    // this function is called by the client when an MQTT connection was successful
+    onSuccess: function () { alert("Connected!"); subscribe(); },
+    // this function is called by the client when an MQTT connection cannot be made
+    onFailure: function (message) { alert("Connection failed: " + message.errorMessage); }
+   };
+
+   // connectionLost() is called by the client when MQTT disconnects (could reconnect here)
+   client.onConnectionLost = connectionLost;
+   function connectionLost (responseObject) {
+    alert("Connection lost: " + responseObject.errorMessage);
+   };
+
+   // messageArrived() is called by the client each time a message is received
+   client.onMessageArrived = messageArrived;
+   function messageArrived (message) {
+    $('#messages').append("<span>&nbsp;&nbsp;&nbsp;&nbsp;" + message.payloadString + "</span><br/>");
+   };
+
+   // subscribe() is called in the "onSuccess" method, after the client has connected
+   function subscribe() {
+    client.subscribe('iot-2/type/BBG_Type/id/BackyardBarometrics001/evt/status/fmt/json', {qos: 2});
+   };
+
+   // init() is called by the "onload" handler for the body of this page
+   function init() {
+    client.connect(options);
+   };
+
+  </script>
+
+ </head>
+
+ <body style="background-color:#f0f0f0; font-family:verdana;" onload="init();">
+ 
+  <h4>DarlingEvil.com ESP8266 MQTT Subscriber</h4>
+
+  Please note that my little ESP8266 "thing" only sends data every 30 minutes (to save power).<br/>
+  <br/>
+  Messages received:<br/>
+
+  <!–– The div below is where received messages will be appended. -->
+  <div id="messages"></div>
+
+ </body>
+
+</html>
+
+

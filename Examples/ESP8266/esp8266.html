@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+ <head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>DarlingEvil ESP8266 MQTT Subscriber</title>
+
+  <!–– The line below is needed to load the JQuery client library. ––>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+  <!–– The line below is needed to load the Paho MQTT client library. ––>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+
+  <script>
+   var sec = 0;
+   var last = "";
+
+   // pad() is used to make time fields always contain 2 digits even when less than 10
+   function pad (val) {
+    return val > 9 ? val : "0" + val;
+   }
+
+   // setInterval() runs once per second to update time fields (see below in html body)
+   setInterval( function() {
+    document.getElementById("seconds").innerHTML=pad(++sec%60);
+    document.getElementById("minutes").innerHTML=pad(parseInt((sec/60)%60,10));
+    document.getElementById("hours").innerHTML=pad(parseInt(sec/3600,10));
+   }, 1000);
+
+   // This is my organization ID in Watson IoT Platform
+   var org = "nzjnxq";
+   // Using a random MQTT "ID" for connecting to the MQTT broker (org prefix is required)
+   var mqtt_id = "a:" + org + ":" + parseInt(Math.random() * 100, 10);
+   // Use port 1883 for insecure access, or port 8883 for secure access
+   var port = 8883;
+   var client = new Paho.MQTT.Client(org + ".messaging.internetofthings.ibmcloud.com", port, mqtt_id);
+
+   var options = {
+    // This username and password are a read-only API key and token I created
+    // inside the Watson IoT Platform (left menu "Apps", then "create API Key")
+    userName:"a-nzjnxq-54fgzfxkkz",
+    password:"JHDLwj(2L!RZw37zs9",
+    // Choose SSL or not based upon the port selected above
+    useSSL:(port != 1883),
+    // this function is called by the client when an MQTT connection was successful
+    onSuccess: function () {
+     //alert("Connected!");
+     subscribe();
+    },
+    // this function is called by the client when an MQTT connection cannot be made
+    onFailure: function (message) {
+     alert("Connection failed: " + message.errorMessage);
+    }
+   };
+
+   // connectionLost() is called by the client when MQTT disconnects (could reconnect here)
+   client.onConnectionLost = connectionLost;
+   function connectionLost (responseObject) {
+    alert("Connection lost: " + responseObject.errorMessage);
+   };
+
+   // messageArrived() is called by the client each time a message is received
+   client.onMessageArrived = messageArrived;
+   function messageArrived (message) {
+    // Suppress duplicate messages, because the ESP sends sets of 3 (to overcome QoS 0)
+    if (message.payloadString != last) {
+     var time = pad(parseInt(sec/3600,10)) + ":" + pad(parseInt(sec/60,10)) + ":" + pad(++sec%60);
+     $('#messages').append("<span>&nbsp;&nbsp;&nbsp;" + time + ":  " + message.payloadString + "</span><br/>");
+     last = message.payloadString;
+    }
+   };
+
+   // subscribe() is called in the "onSuccess" method, after the client has connected
+   function subscribe() {
+    var connect_div = document.getElementById("connect");
+    connect_div.style.display = "none";
+    var timer_div = document.getElementById("timer");
+    client.subscribe('iot-2/type/BBG_Type/id/BackyardBarometrics001/evt/status/fmt/json', {qos: 2});
+    sec = 0;
+    timer_div.style.display = "block";
+   };
+
+   // init() is called by the "onload" handler for the body of this page
+   function init() {
+    client.connect(options);
+   };
+
+  </script>
+
+ </head>
+
+ <body style="background-color:#f0f0f0; font-family:verdana;" onload="init();">
+  
+  <!–– Show a photo of my ESP8266 project in the background. ––>
+<div style="position:absolute; top:0; left:0; width:100%; height:100%; background-repeat:no-repeat; background-color:#c0c0c0; background-image:url(https://i0.wp.com/darlingevil.com/wp-content/uploads/final_soldered.jpg);"></div>
+   
+  <!–– Overlay the photo with a translucent white layer. ––>
+  <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-color:white; opacity:0.925;"></div>
+
+  <!-- Put everything else inside this div as another layer above the other two. -->
+  <div style="position:relative; width:100%; height:100% font-face:verdana">
+ 
+   <!–– Start with some DarlingEvil.com advertising... ––>
+   <center>
+    &nbsp;<br/>
+    <img src="https://i0.wp.com/darlingevil.com/wp-content/uploads/2018/03/cropped-evil.png" width="100px" /><br/>
+    <font size=5 color="#505050">darlingevil.com</font>
+   </center>
+
+   <!–– Page Title ––>
+   <h4>ESP8266 MQTT Subscriber</h4>
+
+   <!–– This "Connecting..." message gets removed when MQTT successfully connects.  ––>
+   <div id="connect" style="display:block">
+    Connecting...
+   </div>
+
+   <div id="timer" style="display:none">
+
+    <!–– Reminder about the potential lag before any data shows up. ––>
+    Please note that my little ESP8266 "thing" only sends data every 30 minutes (to save power).<br/>
+    <br/>
+
+    <!–– This clock continuously updates with the elapsed time since connect. -->
+    Subscribed for: <span id="hours"></span>:<span id="minutes"></span>:<span id="seconds"></span><br/>
+    <span>Messages received:</span><br/>
+
+   </div>
+
+   <!–– The div below is where received messages (with time stamos) will be appended. -->
+   <div id="messages"></div>
+
+  </div>
+
+ </body>
+
+</html>
+
