@@ -66,7 +66,7 @@
    function messageArrived (message) {
     // Suppress duplicate messages, because the ESP sends sets of 3 (to overcome QoS 0)
     if (message.payloadString != last) {
-     var time = pad(parseInt(sec/3600,10)) + ":" + pad(parseInt(sec/60,10)) + ":" + pad(++sec%60);
+     var time = pad(parseInt(sec/3600,10)) + ":" + pad(parseInt((sec/60)%60,10)) + ":" + pad(++sec%60);
      $('#messages').append("<span>&nbsp;&nbsp;&nbsp;" + time + ":  " + message.payloadString + "</span><br/>");
      last = message.payloadString;
     }
